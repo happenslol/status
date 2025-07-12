@@ -32,22 +32,34 @@
           "cargo"
           "clippy"
           "rustc"
+          "rustfmt"
           "rust-src"
           "rustc-codegen-cranelift-preview"
         ]);
 
-      src = craneLib.cleanCargoSource ./.;
+      src = pkgs.lib.fileset.toSource {
+        root = ./.;
+        fileset = pkgs.lib.fileset.unions [
+          ./assets
+          (craneLib.fileset.commonCargoSources ./.)
+        ];
+      };
 
       args = {
         inherit src;
         strictDeps = true;
-        nativeBuildInputs = with pkgs; [pkg-config mold];
+        nativeBuildInputs = with pkgs; [pkg-config mold makeWrapper];
         buildInputs = with pkgs; [libxkbcommon];
       };
 
       cargoArtifacts = craneLib.buildDepsOnly args;
       cargoClippyExtraArgs = "--all-targets -- --deny warnings";
-      package = craneLib.buildPackage (args // {inherit cargoArtifacts;});
+
+      package = craneLib.buildPackage (args
+        // {
+          inherit cargoArtifacts;
+          postInstall = ''wrapProgram "$out/bin/status" --prefix LD_LIBRARY_PATH : "${libraryPath}"'';
+        });
 
       libraryPath = pkgs.lib.makeLibraryPath (with pkgs; [
         libxkbcommon

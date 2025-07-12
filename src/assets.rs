@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use anyhow::{Context, Result};
 use gpui::{App, AssetSource, SharedString};
-use include_fs::{include_fs, IncludeFs};
+use include_fs::{IncludeFs, include_fs};
 
 static ASSETS: IncludeFs = include_fs!("assets");
 
