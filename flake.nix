@@ -26,16 +26,20 @@
         overlays = [fenix.overlays.default];
       };
 
+      rustToolchain = pkgs.fenix.complete.withComponents [
+        "cargo"
+        "clippy"
+        "rustc"
+        "rustfmt"
+        "rust-src"
+        "rustc-codegen-cranelift-preview"
+      ];
+
+      rustPlatform = pkgs.makeRustPlatform {inherit (rustToolchain) cargo rustc;};
+
       craneLib =
         (crane.mkLib pkgs).overrideToolchain
-        (pkgs.fenix.complete.withComponents [
-          "cargo"
-          "clippy"
-          "rustc"
-          "rustfmt"
-          "rust-src"
-          "rustc-codegen-cranelift-preview"
-        ]);
+        rustToolchain;
 
       src = pkgs.lib.fileset.toSource {
         root = ./.;
@@ -48,8 +52,13 @@
       args = {
         inherit src;
         strictDeps = true;
-        nativeBuildInputs = with pkgs; [pkg-config mold makeWrapper];
-        buildInputs = with pkgs; [libxkbcommon];
+        buildInputs = with pkgs; [libxkbcommon pipewire];
+        nativeBuildInputs = with pkgs; [
+          rustPlatform.bindgenHook
+          pkg-config
+          mold
+          makeWrapper
+        ];
       };
 
       cargoArtifacts = craneLib.buildDepsOnly args;
@@ -62,6 +71,7 @@
         });
 
       libraryPath = pkgs.lib.makeLibraryPath (with pkgs; [
+        pipewire
         libxkbcommon
         vulkan-loader
         wayland

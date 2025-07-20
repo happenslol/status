@@ -19,11 +19,13 @@ tracing = "0.1.41"
 include-fs = "0.2.0"
 anyhow = "1.0.98"
 chrono = "0.4.41"
+pipewire = { version = "0.8.0", features = ["v0_3_77"] }
+futures = "0.3.31"
 
 [dependencies.gpui]
-# path = "../zed/crates/gpui"
-git = "https://github.com/happenslol/zed"
-branch = "dev"
+path = "../zed/crates/gpui"
+# git = "https://github.com/happenslol/zed"
+# branch = "dev"
 default-features = false
 features = ["wayland", "http_client"]
 

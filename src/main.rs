@@ -1,4 +1,5 @@
 mod assets;
+mod audio;
 mod logging;
 mod time;
 mod util;
@@ -12,5 +13,6 @@ fn main() {
   Application::new().with_assets(Assets).run(|cx| {
     load_embedded_fonts(cx).unwrap();
     time::init(cx);
+    audio::init(cx);
   });
 }

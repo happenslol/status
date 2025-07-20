@@ -1,6 +1,6 @@
 use std::{env, time::Duration};
 
-use crate::util::{self, h_flex, v_flex};
+use crate::util::{self, h_flex};
 use chrono::{DateTime, Local};
 use gpui::{
   Anchor, App, Bounds, Context, DisplayId, Entity, FontWeight, Layer, LayerShellSettings,
@@ -85,6 +85,11 @@ impl Render for Time {
     let date = SharedString::new(format!("{}", self.now.format("%a, %e %b"))).to_uppercase();
 
     h_flex()
+      .id("time")
+      .on_click(|_, w, _| {
+        println!("Clicked");
+        w.remove_window();
+      })
       .justify_end()
       .items_end()
       .font_family("Noto Sans")
