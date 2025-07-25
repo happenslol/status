@@ -1,4 +1,5 @@
 mod assets;
+mod config;
 mod logging;
 mod time;
 mod util;
@@ -10,7 +11,9 @@ fn main() {
   logging::init();
 
   Application::new().with_assets(Assets).run(|cx| {
-    load_embedded_fonts(cx).unwrap();
+    load_embedded_fonts(cx).expect("load fonts");
+    config::init(cx).expect("init config");
+
     time::init(cx);
   });
 }
