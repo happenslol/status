@@ -1,22 +1,22 @@
-use std::{env, time::Duration};
+use std::time::Duration;
 
-use crate::util::{self, h_flex, v_flex};
+use crate::{
+  config::ConfigExt,
+  util::{self, h_flex},
+};
 use chrono::{DateTime, Local};
 use gpui::{
   Anchor, App, Bounds, Context, DisplayId, Entity, FontWeight, Layer, LayerShellSettings,
   SharedString, Size, Window, WindowOptions, div, point, prelude::*, px, rems, rgb,
 };
-use tracing::{debug, error};
+use tracing::error;
 
 const OPACITY: f32 = 0.25;
 const UPDATE_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn init(cx: &mut App) {
-  match env::var("STATUS_DISPLAY").ok() {
-    Some(connector) => {
-      debug!(connector, "Opening on display");
-      util::with_display(cx, connector, open_window)
-    }
+  match cx.config().time_display {
+    Some(ref connector) => util::with_display(cx, connector.clone(), open_window),
     None => open_window(cx, None),
   }
 }
