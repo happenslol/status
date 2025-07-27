@@ -91,9 +91,11 @@ impl Render for Time {
       .size_full()
       .text_color(rgb(0xffffff))
       .opacity(OPACITY)
+      .gap_2()
       .child(
         div()
           .text_size(rems(1.4))
+          .line_height(rems(1.95))
           .font_weight(FontWeight::SEMIBOLD)
           .child(date),
       )
