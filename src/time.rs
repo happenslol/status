@@ -11,7 +11,7 @@ use gpui::{
 };
 use tracing::error;
 
-const OPACITY: f32 = 0.25;
+const OPACITY: f32 = 0.15;
 const UPDATE_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn init(cx: &mut App) {
