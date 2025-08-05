@@ -11,11 +11,11 @@ use gpui::{
 };
 use tracing::error;
 
-const OPACITY: f32 = 0.15;
+const DEFAULT_OPACITY: f32 = 0.25;
 const UPDATE_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn init(cx: &mut App) {
-  match cx.config().time_display {
+  match cx.config().time.display {
     Some(ref connector) => util::with_display(cx, connector.clone(), open_window),
     None => open_window(cx, None),
   }
@@ -80,7 +80,7 @@ impl Time {
 }
 
 impl Render for Time {
-  fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
+  fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
     let time = SharedString::new(format!("{}", self.now.format("%H:%M")));
     let date = SharedString::new(format!("{}", self.now.format("%a, %e %b"))).to_uppercase();
 
@@ -90,7 +90,7 @@ impl Render for Time {
       .font_family("Noto Sans")
       .size_full()
       .text_color(rgb(0xffffff))
-      .opacity(OPACITY)
+      .opacity(cx.config().time.opacity.unwrap_or(DEFAULT_OPACITY))
       .gap_2()
       .child(
         div()

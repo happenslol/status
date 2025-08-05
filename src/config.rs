@@ -4,7 +4,13 @@ use tracing::{info, warn};
 
 #[derive(Debug, Default, Deserialize)]
 pub struct Config {
-  pub time_display: Option<String>,
+  pub time: TimeConfig,
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub struct TimeConfig {
+  pub display: Option<String>,
+  pub opacity: Option<f32>,
 }
 
 impl Global for Config {}
