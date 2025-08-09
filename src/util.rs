@@ -43,7 +43,7 @@ pub fn with_display(
         Ok(None) => {
           tries += 1;
           if tries > 5 {
-            warn!("Failed to find display after 5 tries");
+            warn!(connector, "Failed to find display after 5 tries");
             cx.update(|cx| f(cx, None)).unwrap();
             break;
           }

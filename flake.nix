@@ -68,7 +68,10 @@
       ]);
     in {
       devShells.default = craneLib.devShell {
-        packages = with pkgs; [watchexec] ++ (with args; (nativeBuildInputs ++ buildInputs));
+        packages = with pkgs;
+          [watchexec rust-analyzer-nightly]
+          ++ (with args; (nativeBuildInputs ++ buildInputs));
+
         LD_LIBRARY_PATH = libraryPath;
       };
 
