@@ -89,6 +89,11 @@ impl Time {
         return;
       };
 
+      let is_present = device.is_present().await.unwrap_or(false);
+      if !is_present {
+        return;
+      }
+
       let Ok(on_battery) = proxy.on_battery().await else {
         return;
       };
