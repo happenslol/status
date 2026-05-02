@@ -49,7 +49,7 @@
         inherit src;
         strictDeps = true;
         nativeBuildInputs = with pkgs; [pkg-config mold makeWrapper];
-        buildInputs = with pkgs; [libxkbcommon];
+        buildInputs = with pkgs; [libxkbcommon fontconfig freetype];
       };
 
       cargoArtifacts = craneLib.buildDepsOnly args;

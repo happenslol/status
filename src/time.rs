@@ -3,8 +3,10 @@ use std::time::Duration;
 use chrono::{DateTime, Local};
 use futures::StreamExt;
 use gpui::{
-  Anchor, App, Bounds, Context, DisplayId, Entity, FontWeight, Layer, LayerShellSettings,
-  SharedString, Size, Window, WindowOptions, div, point, prelude::*, px, rems, rgb,
+  App, Bounds, Context, DisplayId, Entity, FontWeight, SharedString, Size, Window, WindowOptions,
+  div,
+  layer_shell::{Anchor, KeyboardInteractivity, Layer, LayerShellOptions},
+  point, prelude::*, px, rems, rgb,
 };
 use tracing::error;
 
@@ -17,10 +19,14 @@ const DEFAULT_OPACITY: f32 = 0.25;
 const UPDATE_INTERVAL: Duration = Duration::from_secs(1);
 
 pub fn init(cx: &mut App) {
-  match cx.config().time.display {
-    Some(ref connector) => util::with_display(cx, connector.clone(), open_window),
-    None => open_window(cx, None),
-  }
+  let display_id = cx
+    .config()
+    .time
+    .display
+    .as_deref()
+    .and_then(|connector| util::find_display(cx, connector));
+
+  open_window(cx, display_id);
 }
 
 fn open_window(cx: &mut App, display_id: Option<DisplayId>) {
@@ -33,19 +39,22 @@ fn open_window(cx: &mut App, display_id: Option<DisplayId>) {
     })),
     app_id: Some("status".to_string()),
     window_background: gpui::WindowBackgroundAppearance::Transparent,
-    kind: gpui::WindowKind::LayerShell(LayerShellSettings {
+    kind: gpui::WindowKind::LayerShell(LayerShellOptions {
       layer: Layer::Top,
       anchor: Anchor::BOTTOM | Anchor::RIGHT,
       exclusive_zone: None,
       margin: Some((px(0.), px(10.), px(5.), px(0.))),
-      keyboard_interactivity: gpui::KeyboardInteractivity::None,
-      pointer_interactivity: false,
+      keyboard_interactivity: KeyboardInteractivity::None,
       namespace: "status".to_string(),
+      ..Default::default()
     }),
     ..Default::default()
   };
 
-  if let Err(err) = cx.open_window(options, Time::view) {
+  if let Err(err) = cx.open_window(options, |window, cx| {
+    window.set_input_passthrough();
+    Time::view(window, cx)
+  }) {
     error!(?err, "Failed to open window");
     cx.quit();
   }

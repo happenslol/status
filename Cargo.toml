@@ -30,9 +30,16 @@ futures = "0.3.31"
 [dependencies.gpui]
 # path = "../zed/crates/gpui"
 git = "https://github.com/happenslol/zed"
-branch = "dev"
+branch = "gpui-wayland"
 default-features = false
-features = ["wayland", "http_client"]
+features = ["wayland"]
+
+[dependencies.gpui_platform]
+# path = "../zed/crates/gpui_platform"
+git = "https://github.com/happenslol/zed"
+branch = "gpui-wayland"
+default-features = false
+features = ["wayland"]
 
 [build-dependencies]
 include-fs = "0.2.0"

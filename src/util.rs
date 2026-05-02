@@ -1,8 +1,6 @@
 #![allow(dead_code)]
-use std::time::Duration;
-
 use gpui::{App, DisplayId, Div, Styled, div};
-use tracing::{error, warn};
+use tracing::warn;
 
 pub trait StyledExt: Styled + Sized {
   fn h_flex(self) -> Self {
@@ -26,45 +24,16 @@ pub fn v_flex() -> Div {
   div().v_flex()
 }
 
-pub fn with_display(
-  cx: &mut App,
-  connector: String,
-  f: impl FnOnce(&mut App, Option<DisplayId>) + 'static,
-) {
-  cx.spawn(async move |cx| {
-    let mut tries = 0;
-
-    loop {
-      match cx.update(|cx| find_display(cx, &connector)) {
-        Ok(Some(display_id)) => {
-          cx.update(|cx| f(cx, Some(display_id))).unwrap();
-          break;
-        }
-        Ok(None) => {
-          tries += 1;
-          if tries > 5 {
-            warn!(connector, "Failed to find display after 5 tries");
-            cx.update(|cx| f(cx, None)).unwrap();
-            break;
-          }
-        }
-        Err(err) => {
-          error!(?err, "Failed to update");
-          return;
-        }
-      }
-
-      cx.background_executor()
-        .timer(Duration::from_millis(10))
-        .await;
-    }
-  })
-  .detach();
-}
-
-fn find_display(cx: &mut App, connector: &str) -> Option<DisplayId> {
-  cx.displays()
+pub fn find_display(cx: &App, connector: &str) -> Option<DisplayId> {
+  let display_id = cx
+    .displays()
     .iter()
-    .find(|d| d.name().as_deref() == Some(connector))
-    .map(|d| d.id())
+    .find(|d| d.name() == Some(connector))
+    .map(|d| d.id());
+
+  if display_id.is_none() {
+    warn!(connector, "Failed to find display");
+  }
+
+  display_id
 }
